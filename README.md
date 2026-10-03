@@ -59,24 +59,24 @@
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Filters the listings by size and price, then ranks what's left by how many keywords they share with the description. Size matches case-insensitively on whole size tokens, so `M` matches `S/M`, but `S` does not match `US 9` and `L` does not match `XL`.
+- **Inputs:** `description` (str), `size` (str or None — None skips size filtering), `max_price` (float or None, inclusive — None skips price filtering)
+- **Returns:** A list of matching listing dicts, best match first, at most `config.SEARCH_RESULT_LIMIT` of them. Each dict has: id (str), title (str), description (str), category (str), style_tags (list of str), size (str), condition (str), price (float), colors (list of str), brand (str or None — often None), and platform (str).
+- **When it has nothing:** Returns an empty list `[]` (not None, and no exception).
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** It suggests one or two outfits based on the given thrifted item and the user's wardrobe
+- **Inputs:** `new_item` (dict — a listing dict), `wardrobe` (dict with an `'items'` key holding a list of wardrobe items; the list may be empty)
+- **Returns:** A non-empty string with one or two outfit suggestions that name specific pieces the user already owns
+- **When it has nothing:** If the wardrobe is empty, it returns general styling advice for the item rather than raising or returning an empty string.
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** It writes a short caption that someone would post about the thrifted item
+- **Inputs:** `outfit` (string), `new_item` (dict)
+- **Returns:** It returns a two-to-four sentence caption
+- **When it has nothing:** When `outfit` is empty or whitespace, it returns a message saying no outfit was provided so no caption can be written, rather than raising
 
 ---
 
@@ -94,6 +94,7 @@
      function have to be real. -->
 
 **Branch rule:**
+If `search_listings` returns an empty list, put a message in the session saying no listings matched, and stop. Otherwise, take the first result and pass it to `suggest_outfit`.
 
 **Where it lives:** `agent.py::run_agent`
 
