@@ -27,6 +27,13 @@ from utils.data_loader import load_listings
 
 # ── Tool 1: search_listings ───────────────────────────────────────────────────
 
+_STOPWORDS = {
+    "a", "an", "and", "the", "for", "with"
+}
+
+def _size_tokens(size: str) -> set[str]:
+    cleaned = re.sub(r"\([^])")
+
 def search_listings(
     description: str,
     size: str | None = None,
