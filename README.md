@@ -1,23 +1,5 @@
 # FitFindr
 
-> ### 👋 Start here
->
-> **New to this repo? Read [RUNNING.md](RUNNING.md) first** — setup, every
-> command, and what to do when something breaks.
->
-> Once `python test.py` passes:
->
-> ```bash
-> python app.py listings --full -n 6      # read the data (Milestone 1)
-> python app.py fields                    # what you can filter on
-> python app.py ask 'vintage graphic tee under $30'
-> ```
->
-> All three tools are stubs, so that last command will do nothing useful yet.
-> That's the starting position.
->
-> **The rest of this file is your submission.** Fill it in as you go.
-
 ---
 
 <!-- ─────────────────────────────────────────────────────────────────────────
@@ -39,8 +21,7 @@
 
 ## What This Does
 
-<!-- Three or four sentences: what a user asks for, and what they get back. -->
-
+A user can describe a thrift item they are looking for and set a budget. FitFindr uses three tools in sequence of `search_listings` first, to find the best matching items within budget. Then `suggest_outfit` pairs it with pieces the user already owns and suggests some outfits. Last `create_fit_card` to write a caption for the item and look. 
 
 
 ---
@@ -94,13 +75,23 @@
      function have to be real. -->
 
 **Branch rule:**
-If `search_listings` returns an empty list, put a message in the session saying no listings matched, and stop. Otherwise, take the first result and pass it to `suggest_outfit`.
+If `search_listings` returns an empty list, set `session["error"]` to a message that says what was searched (description, size and price if given) and what the user could change (broader words, a different size, a higher price limit). Then return the session without calling `suggest_outfit`, so `selected_item`, `outfit_suggestion` and `fit_card` stay None. Otherwise, put the first result in `session["selected_item"]` and pass it to `suggest_outfit`.
 
 **Where it lives:** `agent.py::run_agent`
 
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which --> 
+**How the query is parsed:** 
+     Regex is used. It first pulls out the price of the item like "under $30" and then it takes out the size. The remaining text is the description of the item. I chose regex because it does not require a model call, making it free. The tradeoff is that it misses phrasing it does not know like "nothing over thirty dollars".
 
 **What moves through the session:** <!-- which fields, in what order -->
+     1. query: the raw text the user typed
+     2. parsed: {description, size, max_price} from parse_query
+     3. the list search_listings returns, through MCP or a direct call if MCP isn't available
+     4. branch: If search_results is empty, error gets a message naming what was searched and what to change, and the run stops there. selected_item, outfit_suggestion and fit_card stay None.
+     5. selected_item: the first search result
+     6. outfit_suggestion: what suggest_outfit(selected_item, wardrobe) returns
+     7. fit_card: what create_fit_card(outfit_suggestion, selected_item) returns
+
+     If the model can't be reached during steps 6-7, error is set and the search results are kept. 
 
 ---
 
@@ -208,15 +199,23 @@ Obsessed with these vintage Levi’s 501 jeans I finally scored on Depop for $38
 
 **Moment 1**
 
-- *What I asked for:*
+- *What I asked for:* 
+     I asked Claude if my #3 criteria is relevant to what the criterion should be about and if someone could check it without asking me what I meant.
+
 - *What came back:*
+     It told me what I was doing right by saying that I "compared the item search picked with what the next tool received" and that it was countable. It also gave me four questions a checker would have to ask me about my criteria. For example, asking "5 of what", "What counts as a match?", "Where do you read each side?", and "Is 3/5 the right bar".
+
 - *What I changed:*
+     I rewrote the criterion from "3/5 selected item listings match" to be across 5 runs of the same test query. I added that clothing item ID picked by `search_listings` matches the ID passed to `suggest_outfit` in the 5 runs, checked from the recorded trace. I raised the bar because a handoff between tools should not break. 
 
 **Moment 2**
 
 - *What I asked for:*
+     I asked it to check whether my `create_fit_card` function was working. 
 - *What came back:*
+     It pointed out bugs in my function and suggested wording changese to the prompt. 
 - *What I changed:*
+     I used its wording changes for item_details and used "{item_details}" in the prompt more efficiently than I had before. I also liked the system string it suggested, so I switched to it. One problem was that every test run generated the same output. When I asked why, it explained that "CACHE_ENABLED" was on and suggested running with "AI201_CACHE=0" when I need fresh output. I kept caching on by default to save API calls while building. 
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
