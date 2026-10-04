@@ -98,7 +98,7 @@ If `search_listings` returns an empty list, put a message in the session saying 
 
 **Where it lives:** `agent.py::run_agent`
 
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which --> 
 
 **What moves through the session:** <!-- which fields, in what order -->
 
@@ -114,25 +114,85 @@ If `search_listings` returns an empty list, put a message in the session saying 
 **One full query**
 
 ```
-$ python app.py ask '...'
+$ python app.py ask 'find me a vintage demin jacket under $45 and style it'
+
+```
+
+```
+[1] parse_query
+      in:  find me a vintage denim jacket under $45 and style it
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Denim Jacket — Light Wash, Cropped, Vintage Levi's 501 Jeans — Medium Wash, 90s Track Jacket — Navy/White Stripe … +7 more
+      →    10 match(es)
+[3] select_item
+      out: Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+[4] suggest_outfit
+      in:  Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+      out: Outfit 1: White ribbed tank top, baggy straight-leg dark wash jeans, light wash cropped denim jacket, chunky w…
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+      out: Scored this light wash cropped denim jacket on Poshmark for $42 and I’m literally obsessed. It hits right at t…
+
+  Found:    Denim Jacket — Light Wash, Cropped — $42.0 on poshmark
+
+  Outfit:   Outfit 1:
+White ribbed tank top, baggy straight-leg dark wash jeans, light wash cropped denim jacket, chunky white sneakers, and black crossbody bag.
+
+Outfit 2:
+Oversized grey crewneck sweatshirt layered under the light wash cropped denim jacket, paired with wide-leg khaki trousers, brown leather belt, and chunky white sneakers.
+
+  Fit card: Scored this light wash cropped denim jacket on Poshmark for $42 and I’m literally obsessed. It hits right at the waist, so it looks so good thrown over baggy dark denim or layered on top of an oversized crewneck with trousers. Double denim energy with the white tank or that effortless skater-chic vibe with the khakis—can't decide which look is my favorite!
+
+2 model calls this session, 412 prompt + 153 output tokens
 
 ```
 
 **The three tools, tested one at a time**
 
+`search_listings`:
 ```
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
+```
+
+Output:
+```
+[{'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.', 'category': 'tops', 'style_tags': ['y2k', 'vintage', 'graphic tee', 'cottagecore'], 'size': 'S/M', 'condition': 'excellent', 'price': 18.0, 'colors': ['white', 'pink', 'purple'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_006', 'title': 'Graphic Tee — 2003 Tour Bootleg Style', 'description': 'Vintage-style bootleg tee with faded graphic. Slightly boxy fit. 100% cotton, soft and worn-in.', 'category': 'tops', 'style_tags': ['graphic tee', 'vintage', 'grunge', 'streetwear', 'band tee'], 'size': 'L', 'condition': 'good', 'price': 24.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_017', 'title': 'Mesh Long-Sleeve Top — Black', 'description': 'Sheer black mesh long-sleeve. Great for layering under a graphic tee or over a bralette. Stretchy material, fits true to size.', 'category': 'tops', 'style_tags': ['y2k', 'grunge', 'goth', 'layering'], 'size': 'S/M', 'condition': 'excellent', 'price': 15.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_033', 'title': 'Vintage Band Tee — Faded Grey', 'description': 'Faded grey band-style tee with distressed graphic. Crew neck. Fits boxy. Well-loved but no holes or major damage.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'band tee', 'graphic tee', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 19.0, 'colors': ['grey', 'charcoal'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_011', 'title': 'Low-Rise Cargo Pants — Khaki', 'description': 'Y2K era low-rise cargo pants. Lots of pockets. Khaki color, slightly distressed at the hems. Great for layering with a long tee.', 'category': 'bottoms', 'style_tags': ['y2k', 'cargo', '2000s', 'streetwear'], 'size': 'W29', 'condition': 'fair', 'price': 27.0, 'colors': ['khaki', 'tan'], 'brand': None, 'platform': 'poshmark'}, {'id': 'lst_015', 'title': 'Vintage Graphic Hoodie — Faded Black', 'description': 'Faded black pullover hoodie with barely-visible vintage graphic on the chest. Cozy interior. Some pilling but adds to the worn-in look.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'graphic', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 26.0, 'colors': ['black', 'charcoal'], 'brand': None, 'platform': 'depop'}]
+```
+
+`suggest_outfit`:
+```
+$ python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
+```
+
+Output:
+```
+Outfit 1:
+White ribbed tank top
+Vintage Levi's 501 Jeans
+Black cropped zip hoodie
+Chunky white sneakers
+Black crossbody bag
+
+Outfit 2:
+Oversized grey crewneck sweatshirt
+Vintage Levi's 501 Jeans
+Brown leather belt
+Black combat boots
+Black crossbody bag
+```
+
+`create_fit_card`:
+```
+$ AI201_CACHE=0 python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
 
 ```
 
+Output:
 ```
-$ python -c "from tools import suggest_outfit; ..."
-
-```
-
-```
-$ python -c "from tools import create_fit_card; ..."
-
+Obsessed with these vintage Levi’s 501 jeans I finally scored on Depop for $38. Threw them on with my beat-up white sneakers for that effortlessly cool 90s running-errands vibe. Honestly, nothing beats finding the *exact* wash you’ve been hunting for.
 ```
 
 ---
