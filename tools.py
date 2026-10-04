@@ -267,7 +267,7 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
         f"I'm styling it like this: {outfit}\n\n"
         "Write a 2-4 sentence social media caption about this find. "
         "Make it sound like a real post, not a product description. "
-        "Mentiion the item, price, and platform once each, and be specific about the vibe of the outfit."
+        "Mention the item, price, and platform once each, and be specific about the vibe of the outfit."
     )
 
     system = "You write casual, authentic social media captions for thrift hauls."
