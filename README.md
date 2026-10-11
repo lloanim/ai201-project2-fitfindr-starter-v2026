@@ -105,7 +105,7 @@ If `search_listings` returns an empty list, set `session["error"]` to a message 
 **One full query**
 
 ```
-$ python app.py ask 'find me a vintage demin jacket under $45 and style it'
+$ python app.py ask 'find me a vintage denim jacket under $45 and style it'
 
 ```
 

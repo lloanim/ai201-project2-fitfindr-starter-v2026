@@ -66,24 +66,22 @@ from tools import search_listings as _search_listings_impl  # noqa: F401 — you
 # CallToolRequest" and the output you actually care about scrolls away.
 mcp = FastMCP("fitfindr", log_level="WARNING")
 
+@mcp.tool()
+def search_listings(
+    description: str,
+    size: str | None = None,
+    max_price: float | None = None,
+) -> list[dict]:
+    """
+    
+    Searches clothing listings for the best keyword overlap with a given 'description'.
+    Optionally filters results by 'max_price' (inclusive) and size (case-insensitive matching
+    using recognized size tokens). Returns a list of listing dictionaries ordered by best match, 
+    or an empty list ([]) if no listings match.
 
-# ── TODO: uncomment and fill this in ──────────────────────────────────────────
-#
-# @mcp.tool()
-# def search_listings(
-#     description: str,
-#     size: str | None = None,
-#     max_price: float | None = None,
-# ) -> list[dict]:
-#     """
-#     <-- YOUR DESCRIPTION GOES HERE.
-#
-#         One or two sentences. What does this tool do, what does it need, and
-#         what does it give back when it finds nothing? Written for a reader
-#         who cannot see the code.
-#     """
-#     return _search_listings_impl(description, size, max_price)
-#
+    """
+    return _search_listings_impl(description, size, max_price)
+
 # ──────────────────────────────────────────────────────────────────────────────
 #
 # Two notes on the block above.
