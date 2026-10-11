@@ -575,15 +575,23 @@ Trace:
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Given a query that matches at least one listing, the agent completes all three
+tool calls and returns a fit card | 4 of 5 | PASS | Verified that the keywords 'graphic tee' from description matched the chosen item |
+| 2 | Given a query that matches no listings, the agent stops before calling
+`suggest_outfit` and returns a message naming what to change | 5 of 5 | PASS | It tells if it stopped, giving its reason and what to change in the description. Verified that the stop is before 'suggest_outfit' is runned in trace |
+| 3 | Across 5 runs, compare `session["selected_item"][id]` after the search step against the `new_item[id]` recorded in the trace's `suggest_outfit` step inputs. | 5 of 5 | PASS | Verified that the item out in 'select_item' is the same as the item in for 'suggest_outfit' |
+| 4 | two items chosen from different categories in `listings.json` each generate a fit card, and the two cards do not have identical opening sentences. | 4 of 5 | PASS | Compared the first opening sentence in fit card from each try for both shoe query and top query |
+| 5 | with an empty wardrobe, the top `search_listing` result is passed to the fit card. The card returns without error, it does not refer to items as if they own it, and it names at least one color or item type to pair with the searched item.  | 5 of 5 | PASS | Verified that fit card it generated, colors and pieces are suggested |
 
 **Diagnoses**
 
+I missed no criteria. All five were met, but criteria 4 and 5 were set too low.
 
+Criterion 4 was too broad.
+The statement of "identical opening sentences" in the criteria almost never happens because the LLM varies its wording, but it still follows a template. I tested two different categories, shoes and tops, and both openings used "score", "scored", "obsessed", or "literally". The first shoes run ended with "and I'm literally obsessed" and the fourth tops run ended with the same wording. A tighter target would be that across the 10 tries, 5 from shoes and 5 from tops. No two opening sentences share the same first three words and no exact phrase of 4 or more words appears in more than one opening sentence.
+
+Criterion 5 was also too broad.
+The top result being passed is deterministic, because `select_item` is coded that way. A card being returned and naming a color or item type is almost guaranteed for any fit card. The part that actually tests something is "does not refer to items as if they own it", since the user does not own anything in an empty wardrobe. That wording was too vague to score, in try #4, "Throwing it on with low-rise baggy jeans and chunky sneakers", implies that the user owns the jeans but still passed. A tighter target would be that for 5 of 5 tries with the empty wardrobe there is no use of words of ownership like "my" or present-tense wearing verb for a paired piece. 
 
 ---
 
