@@ -299,12 +299,56 @@ that produced it:
 **Happy path**
 
 ```
+$ python app.py ask 'green velvet blazer under $60' --trace
+[1] parse_query
+      in:  green velvet blazer under $60
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 7 items: Velvet Blazer — Emerald Green, 90s Silk Slip Dress — Floral, Midi Length, Vintage Linen Blazer — Cream … +4 more
+      →    7 match(es)
+[3] select_item
+      out: Velvet Blazer — Emerald Green ($52.0, depop)
+[4] suggest_outfit
+      in:  Velvet Blazer — Emerald Green ($52.0, depop)
+      out: Outfit One Pair the emerald velvet blazer with the white ribbed tank top, baggy dark-wash straight-leg jeans, …
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Velvet Blazer — Emerald Green ($52.0, depop)
+      out: scored this emerald velvet blazer on depop for $52 and I am officially obsessed with how rich the color is. hi…
+
+  Found:    Velvet Blazer — Emerald Green — $52.0 on depop
+
+  Outfit:   Outfit One
+Pair the emerald velvet blazer with the white ribbed tank top, baggy dark-wash straight-leg jeans, chunky white sneakers, and the black crossbody bag. Add the brown leather belt to define the waist. This balances the glamorous jacket with casual denim for an effortless high-low look.
+
+Outfit Two
+Layer the emerald velvet blazer over the black cropped zip hoodie paired with the wide-leg khaki trousers and black combat boots. Finish with the black crossbody bag. The rich green elevates the sporty hoodie and tailored trousers for a chic, textured contrast.
+
+  Fit card: scored this emerald velvet blazer on depop for $52 and I am officially obsessed with how rich the color is. high-low styling is my whole personality right now, so throwing it on with baggy dark-wash denim and chunky sneaks is *the* move. honestly can't decide if I love it more dressed down like that or paired with combat boots and a zip hoodie for that ultimate high-low contrast. ✨
+
+2 model calls this session, 445 prompt + 199 output tokens
 
 ```
 
 **Empty search**
 
 ```
+$ python app.py ask 'red ski googles under $10' --trace
+[1] parse_query
+      in:  red ski googles under $10
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
+      →    0 match(es)
+[3] branch
+      →    search returned []: stopping before suggest_outfit
+
+  Nothing in the listings matched description 'red ski googles', under $10.
+Things to change: try broader words — 'jacket' finds more than 'cropped corduroy jacket'; raise the price ceiling above $10.
+
+0 model calls this session
 
 ```
 

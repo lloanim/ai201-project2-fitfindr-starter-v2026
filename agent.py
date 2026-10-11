@@ -118,7 +118,6 @@ def _search(parsed: dict) -> list[dict]:
 
         return results or []
     except Exception:  # noqa: BLE001 — MCP unavailable is not a user-facing error
-        raise   # temporary: show the MCP error instead of hiding it
         return search_listings(
             parsed["description"], parsed["size"], parsed["max_price"]
         )
