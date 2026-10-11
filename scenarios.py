@@ -35,18 +35,37 @@ SCENARIOS = [
         "wardrobe": "empty",
         "criterion": None,
     },
-    # TODO: add what your criteria 3, 4 and 5 need.
-    #
-    # Set "criterion" to the number in criteria.md that the scenario tests.
-    # "criterion": None means a diagnostic run — useful to have, but it isn't
-    # one of your five, and run_eval.py marks it as such in the table.
-    #
-    # For a state criterion, any normal query works — what you're checking is
-    # what ends up in the session, not what the user typed.
-    #
-    # For a fit-card criterion, you probably want the SAME query listed more
-    # than once, or several different items, depending on what your criterion
-    # actually says.
+    {
+        # Criterion 3 — state. Needs a query that gets past search so
+        # suggest_outfit runs, then compare session["selected_item"]["id"]
+        # with the new_item["id"] in the trace's suggest_outfit inputs.
+        "name": "selected item reaches suggest_outfit",
+        "query": "denim jacket under $50",
+        "wardrobe": "example",
+        "criterion": 3,
+    },
+    {
+        # Criterion 4, item A (shoes). Compare its fit card's opening
+        # sentence with item B's below, run by run.
+        "name": "fit card opening — shoes",
+        "query": "chelsea boots under $50",
+        "wardrobe": "example",
+        "criterion": 4,
+    },
+    {
+        # Criterion 4, item B (tops).
+        "name": "fit card opening — tops",
+        "query": "flannel shirt under $30",
+        "wardrobe": "example",
+        "criterion": 4,
+    },
+    {
+        # A query with no wardrobe items
+        "name": "empty wardrobe passed to fit card",
+        "query": "vintage graphic tee under $30",
+        "wardrobe": "empty",
+        "criterion": 5,
+    }
 ]
 
 WARDROBES = ("example", "empty")

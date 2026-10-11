@@ -237,17 +237,320 @@ Obsessed with these vintage Levi’s 501 jeans I finally scored on Depop for $38
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. matching query completes | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. impossible query stops early | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. selected item reaches suggest_outfit | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. fit card opening — shoes | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. fit card opening — tops | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. empty wardrobe passed to fit card | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
 **Real output from one try**, pasted as text, naming the file and function
 that produced it:
 
+Criterion 1: produced by `run_agent()` in agent.py (via `python run_eval.py --label before`),
+copied from results/run_2026-10-11_1250_before.md.
+Outfit suggestion from `suggest_outfit()` (tools.py); fit card from `create_fit_card()` (tools.py).
+
+
+- Query: `vintage graphic tee under $30`
+- Wardrobe: example
+
+**Try 1**
+
+- stopped early: no
+- selected_item: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+- search_results: 10
+
+Outfit suggestion:
+
+```
+Outfit 1: Pair the Y2K baby tee with your baggy straight-leg jeans, black crossbody bag, and chunky white sneakers for an easy, balanced throwback look.
+
+Outfit 2: Layer the vintage black denim jacket over the Y2K baby tee, worn with your wide-leg khaki trousers and black combat boots for a sweet-meets-edgy vibe.
 ```
 
+Fit card:
+
+```
+Okay obsessed is an understatement for this Y2K butterfly baby tee I just scored on Depop for $18. 🦋 I'm totally living for the sweet-meets-edgy vibe today, so I layered it under my vintage black denim jacket with wide-leg khaki trousers and chunky combat boots. Such a win!
+```
+
+Trace:
+
+```
+[1] parse_query
+      in:  vintage graphic tee under $30
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Y2K Baby Tee — Butterfly Print, Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey … +7 more
+      →    10 match(es)
+[3] select_item
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  Y2K Baby Tee — Butterfly Print ($18.0, depop)
+      out: Outfit 1: Pair the Y2K baby tee with your baggy straight-leg jeans, black crossbody bag, and chunky white snea…
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Y2K Baby Tee — Butterfly Print ($18.0, depop)
+      out: Okay obsessed is an understatement for this Y2K butterfly baby tee I just scored on Depop for $18. 🦋 I'm total…
+```
+
+Criterion 2: produced by `run_agent()` in agent.py (via `python run_eval.py --label before`),
+copied from results/run_2026-10-11_1250_before.md.
+Stops after `search_listings` returns no matches; suggest_outfit and create_fit_card never run.
+
+
+- Query: `designer ballgown size XXS under $5`
+- Wardrobe: example
+
+**Try 1**
+
+- stopped early: yes — Nothing in the listings matched description 'designer ballgown', size XXS, under $5.
+Things to change: try broader words — 'jacket' finds more than 'cropped corduroy jacket'; drop the size, or try a neighbouring one; raise the price ceiling above $5.
+- selected_item: (none)
+- search_results: 0
+
+Trace:
+
+```
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
+      →    0 match(es)
+[3] branch
+      →    search returned []: stopping before suggest_outfit
+```
+
+Criterion 3: produced by `run_agent()` in agent.py (via `python run_eval.py --label before`),
+copied from results/run_2026-10-11_1250_before.md.
+Outfit suggestion from `suggest_outfit()` (tools.py); fit card from `create_fit_card()` (tools.py).
+
+- Query: `denim jacket under $50`
+- Wardrobe: example
+
+**Try 1**
+
+- stopped early: no
+- selected_item: Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+- search_results: 7
+
+Outfit suggestion:
+
+```
+Outfit One: Double Denim Contrast
+Pair the new light wash cropped denim jacket with your white ribbed tank top tucked into your baggy dark wash straight-leg jeans. Finish with your chunky white sneakers and black crossbody bag for an easy streetwear look that plays with denim shades.
+
+Outfit Two: Casual Streetwear
+Layer the new jacket over your black cropped zip hoodie and pair it with your wide-leg khaki trousers and chunky white sneakers. Add the black crossbody bag for a balanced mix of vintage and modern proportions.
+```
+
+Fit card:
+
+```
+Scoredddd this light wash cropped denim jacket on Poshmark for $42 and I'm honestly obsessed. It’s been living in my rotation for both baggy dark wash double-denim moments and cozy zip-hoodie streetwear fits. Such a good find for nailing that effortless, vintage-meets-modern look without even trying.
+```
+
+Trace:
+
+```
+[1] parse_query
+      in:  denim jacket under $50
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 7 items: Denim Jacket — Light Wash, Cropped, Vintage Levi's 501 Jeans — Medium Wash, 90s Track Jacket — Navy/White Stripe … +4 more
+      →    7 match(es)
+[3] select_item
+      out: Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+[4] suggest_outfit
+      in:  Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+      out: Outfit One: Double Denim Contrast Pair the new light wash cropped denim jacket with your white ribbed tank top…
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+      out: Scoredddd this light wash cropped denim jacket on Poshmark for $42 and I'm honestly obsessed. It’s been living…
+```
+
+Trace:
+
+```
+[1] parse_query
+      in:  denim jacket under $50
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 7 items: Denim Jacket — Light Wash, Cropped, Vintage Levi's 501 Jeans — Medium Wash, 90s Track Jacket — Navy/White Stripe … +4 more
+      →    7 match(es)
+[3] select_item
+      out: Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+[4] suggest_outfit
+      in:  Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+      out: Outfit One: Double Denim Contrast Pair the new light wash cropped denim jacket with your white ribbed tank top…
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Denim Jacket — Light Wash, Cropped ($42.0, poshmark)
+      out: Scoredddd this light wash cropped denim jacket on Poshmark for $42 and I'm honestly obsessed. It’s been living…
+```
+
+Criterion 4: produced by `run_agent()` in agent.py (via `python run_eval.py --label before`),
+copied from results/run_2026-10-11_1250_before.md.
+Outfit suggestion from `suggest_outfit()` (tools.py); fit card from `create_fit_card()` (tools.py).
+
+Shoes-
+- Query: `chelsea boots under $50`
+- Wardrobe: example
+
+**Try 1**
+
+- stopped early: no
+- selected_item: Suede Chelsea Boots — Tan ($44.0, poshmark)
+- search_results: 1
+
+Outfit suggestion:
+
+```
+Outfit 1:
+Wide-leg khaki trousers, white ribbed tank top, and your new tan suede Chelsea boots. Accessorize with your brown leather belt for a cohesive earth-tone look.
+
+Outfit 2:
+Baggy straight-leg dark wash jeans, white ribbed tank top, and your vintage black denim jacket layered over top, finished with the new tan suede Chelsea boots and brown leather belt.
+```
+
+Fit card:
+
+```
+Scoredddd these tan suede Chelsea boots on Poshmark for $44 and I’m literally obsessed. They are *so* good for that effortless earth-tone moment with wide-leg trousers, or scaled back with baggy dark wash denim and a vintage black jacket for off-duty coffee run vibes. Such a win! 🤎✨
+```
+
+Trace:
+
+```
+[1] parse_query
+      in:  chelsea boots under $50
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 1 items: Suede Chelsea Boots — Tan
+      →    1 match(es)
+[3] select_item
+      out: Suede Chelsea Boots — Tan ($44.0, poshmark)
+[4] suggest_outfit
+      in:  Suede Chelsea Boots — Tan ($44.0, poshmark)
+      out: Outfit 1: Wide-leg khaki trousers, white ribbed tank top, and your new tan suede Chelsea boots. Accessorize wi…
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Suede Chelsea Boots — Tan ($44.0, poshmark)
+      out: Scoredddd these tan suede Chelsea boots on Poshmark for $44 and I’m literally obsessed. They are *so* good for…
+```
+
+Tops -
+- Query: `flannel shirt under $30`
+- Wardrobe: example
+
+**Try 1**
+
+- stopped early: no
+- selected_item: Oversized Flannel Shirt — Plaid Red/Black ($22.0, thredUp)
+- search_results: 2
+
+Outfit suggestion:
+
+```
+Outfit 1:
+White ribbed tank top, baggy straight-leg dark wash jeans, oversized red/black flannel shirt worn open, and black combat boots.
+
+Outfit 2:
+Black cropped zip hoodie layered under the oversized red/black flannel shirt, wide-leg khaki trousers, and chunky white sneakers.
+```
+
+Fit card:
+
+```
+Honestly obsessed with how cozy this oversized red/black plaid flannel is, especially for only $22 on thredUp. Outfit 1 gives major 90s grunge with the white tank, baggy dark wash jeans, and combat boots, while Outfit 2 leans way more into that effortless streetwear vibe layered over a black cropped hoodie with wide-leg khakis. Truly my new fall uniform.
+```
+
+Trace:
+
+```
+[1] parse_query
+      in:  flannel shirt under $30
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 2 items: Oversized Flannel Shirt — Plaid Red/Black, Vintage Polo Shirt — Forest Green
+      →    2 match(es)
+[3] select_item
+      out: Oversized Flannel Shirt — Plaid Red/Black ($22.0, thredUp)
+[4] suggest_outfit
+      in:  Oversized Flannel Shirt — Plaid Red/Black ($22.0, thredUp)
+      out: Outfit 1: White ribbed tank top, baggy straight-leg dark wash jeans, oversized red/black flannel shirt worn op…
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Oversized Flannel Shirt — Plaid Red/Black ($22.0, thredUp)
+      out: Honestly obsessed with how cozy this oversized red/black plaid flannel is, especially for only $22 on thredUp.…
+```
+
+Criterion 5: produced by `run_agent()` in agent.py (via `python run_eval.py --label before`),
+copied from results/run_2026-10-11_1250_before.md.
+Outfit suggestion from `suggest_outfit()` (tools.py); fit card from `create_fit_card()` (tools.py).
+Run with an empty wardrobe, so suggest_outfit received 0 wardrobe items.
+
+
+- Query: `vintage graphic tee under $30`
+- Wardrobe: empty
+
+**Try 1**
+
+- stopped early: no
+- selected_item: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+- search_results: 10
+
+Outfit suggestion:
+
+```
+1. Colors
+Pair it with denim blue, sage green, pastel yellow, or neutral white, cream, and black to let the pink and purple pop.
+
+2. Pieces
+Bottoms: Low-rise cargo pants, pleated tennis skirts, flare jeans, or nylon track pants.
+Shoes: Chunky sneakers, platform sandals, or ballet flats.
+Outerwear: Oversized zip-up hoodies, cropped faux-leather jackets, or vintage cardigans.
+Accessories: Baguette bags and claw clips.
+
+3. Example Outfits
+Outfit 1: Pair the baby tee with baggy low-rise light wash jeans, chunky white sneakers, and a pastel pink baguette bag for an authentic Y2K streetwear look.
+Outfit 2: Tuck the tee into a white pleated mini skirt, add platform sneakers, and layer with an oversized zip-up hoodie for a sweet, nostalgic vibe.
+```
+
+Fit card:
+
+```
+Obsessed with this Y2K butterfly baby tee I just scored on Depop for $18! It’s giving major nostalgic energy styled with baggy low-rise light wash denim, chunky sneakers, and a pastel pink baguette bag. Safe to say this is going to be my entire personality all summer. 🦋✨
+```
+
+Trace:
+
+```
+[1] parse_query
+      in:  vintage graphic tee under $30
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Y2K Baby Tee — Butterfly Print, Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey … +7 more
+      →    10 match(es)
+[3] select_item
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  Y2K Baby Tee — Butterfly Print ($18.0, depop)
+      out: 1. Colors Pair it with denim blue, sage green, pastel yellow, or neutral white, cream, and black to let the pi…
+      →    0 wardrobe item(s)
+[5] create_fit_card
+      in:  Y2K Baby Tee — Butterfly Print ($18.0, depop)
+      out: Obsessed with this Y2K butterfly baby tee I just scored on Depop for $18! It’s giving major nostalgic energy s…
 ```
 
 ---

@@ -58,7 +58,7 @@ Nothing on this path involves the model. Parsing is regex, `search_listing` filt
      compares session["selected_item"] against what actually reached
      suggest_outfit is the shape you're after. -->
 
-Across 5 runs, compare `session["selected_item"][id]` after the search step against the `new_item["id"]` recorded in the trace's `suggest_outfit` step inputs. Target: 5/5
+Across 5 runs, compare `session["selected_item"][id]` after the search step against the `new_item[id]` recorded in the trace's `suggest_outfit` step inputs. Target: 5/5
 
 **Why this target:**
 
