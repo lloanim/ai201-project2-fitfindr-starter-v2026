@@ -680,24 +680,32 @@ full. -->
      `python run_eval.py --label after` -->
 
 **What I changed:**
+I edited the prompt in `create_fit_card` to avoid adding words 'Scored', 'Obsessed', 'Snagged', 'Found', 'Got', or any other stock thrift-haul opener, in the opening sentence. Instead I required the caption to open wth the outfit's vibe or one specific detail of the item (a color, print, or cut) instead of the price or platform. 
 
 **Which failure it was meant to fix:**
+Criterion 4. The original prompt caused the model to fall into a template for generating the captions because of the lack of guidance on how to open. The captions for items from different categories all started with the same kind of stock phrases. That made the fit cards sound generic and interchangeable regardless of the item. 
 
 ### Run Log — After
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. matching query completes | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. impossible query stops early | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. selected item reaches suggest_outfit | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. fit card opening — shoes | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. fit card opening — tops | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. empty wardrobe passed to fit card | 5 of 5 | PASS | PASS | PASS | PASS | FAIL | MISSED (4/5) |
 
 **Did it help, and how do I know:**
 
 <!-- If it made things worse, say that. Honestly reported, that earns full
      credit and is more interesting than one that worked. -->
 
+For criterion 4, without constraints the model defaulted to stock thrift haul openers like 'Scored', 'Obsessed', and 'Snagged', which made captions interchangeable across items. For example, "Scoredddd these tan suede Chelsea boots on Poshmark for $44 and I’m literally obsessed." Banning those openers and requiring the first sentence to reference the vibe or concrete detail produced captions more specific to each find. For example, "Buttery tan suede that instantly makes every outfit look 10x more expensive." This leads the caption to be more oriented towards the find rather than following the generic template of the find.
+Due to my criterion being to broad, all 5 tries passes because the two cards never had identical openings. The downside to this change is that the restriction created a new pattern. Both openers now consistently start by describing the item, so it is less generic but still structurally similar to each other.
+
+
+For criterion 5, a visible fail occurs in Try #5 where it states "I am so ready to lean all the way into that sweet-yet-edgy aesthetic with my oversized leather jacket and chunky platforms". With an empty wardrobe, the card should not refer to the user owning anything to pair the find with. The leather jacket came from the outfit suggestion, and th fit card turned it into something the user owns. 
 
 
 ---
