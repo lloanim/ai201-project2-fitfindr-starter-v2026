@@ -584,10 +584,8 @@ Trace:
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 | Given a query that matches at least one listing, the agent completes all three
-tool calls and returns a fit card | 4 of 5 | PASS | Verified that the keywords 'graphic tee' from description matched the chosen item |
-| 2 | Given a query that matches no listings, the agent stops before calling
-`suggest_outfit` and returns a message naming what to change | 5 of 5 | PASS | It tells if it stopped, giving its reason and what to change in the description. Verified that the stop is before 'suggest_outfit' is runned in trace |
+| 1 | Given a query that matches at least one listing, the agent completes all three tool calls and returns a fit card | 4 of 5 | PASS | Verified that the keywords 'graphic tee' from description matched the chosen item |
+| 2 | Given a query that matches no listings, the agent stops before calling `suggest_outfit` and returns a message naming what to change | 5 of 5 | PASS | It tells if it stopped, giving its reason and what to change in the description. Verified that the stop is before 'suggest_outfit' is runned in trace |
 | 3 | Across 5 runs, compare `session["selected_item"][id]` after the search step against the `new_item[id]` recorded in the trace's `suggest_outfit` step inputs. | 5 of 5 | PASS | Verified that the item out in 'select_item' is the same as the item in for 'suggest_outfit' |
 | 4 | two items chosen from different categories in `listings.json` each generate a fit card, and the two cards do not have identical opening sentences. | 4 of 5 | PASS | Compared the first opening sentence in fit card from each try for both shoe query and top query |
 | 5 | with an empty wardrobe, the top `search_listing` result is passed to the fit card. The card returns without error, it does not refer to items as if they own it, and it names at least one color or item type to pair with the searched item.  | 5 of 5 | PASS | Verified that fit card it generated, colors and pieces are suggested |
