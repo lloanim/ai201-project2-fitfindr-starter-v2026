@@ -217,6 +217,15 @@ Obsessed with these vintage Levi’s 501 jeans I finally scored on Depop for $38
 - *What I changed:*
      I used its wording changes for item_details and used "{item_details}" in the prompt more efficiently than I had before. I also liked the system string it suggested, so I switched to it. One problem was that every test run generated the same output. When I asked why, it explained that "CACHE_ENABLED" was on and suggested running with "AI201_CACHE=0" when I need fresh output. I kept caching on by default to save API calls while building. 
 
+**Moment 3**
+
+- *What I asked for:*
+     I asked ChatGPT to review my description for the MCP tool which was initially four sentences long
+- *What came back:*
+     It told me what I had done right and gave me what to improve on by saying "clarify the price units", "Be careful about the number of listings", "Simplify the size explaination", "Distinguish filtering from ranking", and "Keep the description focused".
+- *What I changed:*
+     I shorten the description to three sentences so it stays focused on what the function does. I took its suggestions to simplify the size explaination and to separate filtering from ranking. I also removed the part about price, since price is only an optional filter and not central to how the function works. 
+     
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
      Don't fill these in during unit 3.
@@ -663,12 +672,8 @@ Things to change: try broader words — 'jacket' finds more than 'cropped cordur
 
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything
-behaved differently afterwards. If the rewire didn't work, say exactly where it
-broke — the error text and the last thing that worked. That earns the point in
-full. -->
-
-
+**On the MCP move:** 
+Changed `agent.py` so `search_listings` is called through the MCP client, passing the tool's name and a dict of arguements instead of positional arguements. At first I thought the rewire did not work because I tested it with the full query from this README and got a different item back. It turned out I had "denim" misspelled in the README and when I copied it, it changed which listing matched. After fixing the typo and rerunning, the output matched the pre-rewire result exactly.  
 
 ---
 
@@ -716,7 +721,9 @@ For criterion 5, a visible fail occurs in Try #5 where it states "I am so ready 
      you did. "I ran out of time" is fine if it's true. Pretending nothing is
      left is not. -->
 
-
+Criterion 5 (empty wardrobe to fit card): 4/5 fail
+The empty wardrobe case is handled in `suggest_outfit`, which asks for generic pieces. But that context isn't passed to `create_fit_card`. Its prompt ("I'm styling it like this: {outfit}") presents the generic suggestions as the user owns the clothing, so nothing stops the caption from claiming ownership. The 4 passing tries were by luck like in the before run. Try #5 shows the failure. 
+What I'd do is pass a `wardrobe_empty` flag into `create_fit_card`. When its true, the caption should not use "my" for anything except the thrifted item. I stopped here because for the project I chose to fix the issue of criterion 4. I did not find the real issue of criterion 5 until the after run log. 
 
 <!-- ═════════════════════════════════════════════════════════════════════
 
